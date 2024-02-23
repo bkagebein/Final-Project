@@ -41,7 +41,7 @@ public class VolunteerVictimGUI extends JFrame {
         incrementVictimScoreButton = new JButton("+1");
         incrementVictimScoreButton.setEnabled(false); // Initially disabled
         middlePanel.add(pickRandomVictimButton);
-        middlePanel.add(selectedVictimLabel); // NEW: Add label to panel
+        middlePanel.add(selectedVictimLabel); // Add label to panel
         middlePanel.add(incrementVictimScoreButton);
 
         // Bottom Section - Leaderboard

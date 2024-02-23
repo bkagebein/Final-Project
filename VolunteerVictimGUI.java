@@ -10,7 +10,7 @@ public class VolunteerVictimGUI extends JFrame {
     private JComboBox<String> volunteerDropdown;
     private JLabel selectedVolunteerLabel; // Displays the selected volunteer's name
     private JButton incrementVolunteerScoreButton; // Button to increment volunteer score
-    private JLabel selectedVictimLabel; // NEW: Displays the selected victim's name
+    private JLabel selectedVictimLabel; //  Displays the selected victim's name
     private JButton incrementVictimScoreButton; // Button to increment victim score
     private JButton pickRandomVictimButton; // Button to pick a random victim
     private JTable leaderboard;

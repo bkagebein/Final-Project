@@ -51,10 +51,14 @@ public class VolunteerVictimGUI extends JFrame {
         JScrollPane leaderboardScrollPane = new JScrollPane(leaderboard);
         updateLeaderboard();
 
+        //Creating timer panel
+        Timer timerPanel = new Timer();
+
         // Adding sections to the frame
         add(topPanel, BorderLayout.NORTH);
         add(middlePanel, BorderLayout.CENTER); // Adjust to add middlePanel
         add(leaderboardScrollPane, BorderLayout.SOUTH);
+        add(timerPanel, BorderLayout.EAST);
 
         // Event Listeners
         volunteerDropdown.addActionListener((ActionEvent e) -> {

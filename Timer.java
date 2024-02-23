@@ -20,11 +20,6 @@ public class Timer extends JPanel {
     //This is the timer object.
     private javax.swing.Timer timer;
     public Timer() {
-        //Create panel to display the timer
-        JPanel mainPanel = new JPanel(new FlowLayout());
-        //Create a panel to display the ten, thirty and minute timer options.
-        JPanel buttonPanel = new JPanel(new FlowLayout());
-
         //initialize the counter to 0
         counter = 0;
 

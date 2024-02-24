@@ -39,20 +39,34 @@ public class NameManager {
         return pickedName;
     }
 
-    // Resets all data, clearing picked victims and setting all scores to 0.
-    public void resetData() {
-        // Reset each name's score to 0.
-        for (String name : scores.keySet()) {
-            scores.put(name, 0);
-        }
+    // Resets data, clearing picked victims
+    public void resetList() {
         // Clear the set of picked victims.
         pickedVictims.clear();
     }
 
+    //Resets data, settings all scores to 0
+    public void resetScores(){
+        // Reset each name's score to 0.
+        for (String name : scores.keySet()) {
+            scores.put(name, 0);
+        }
+    }
+
     // Updates the score for a given name.
     public void updateScore(String name, int points) {
-        // Add the given points to the current score of the name.
-        scores.put(name, scores.getOrDefault(name, 0) + points);
+        //if points results in score going below 0, dont add points
+        if (scores.get(name) <= 0 && (points < 0)){
+            scores.put(name, 0);
+            //scores.put(name, (Integer)scores.getOrDefault(name, 0));
+        }
+        else if(scores.get(name) + points < 0){
+            scores.put(name, 0);
+        }
+        //add points to score!
+        else{
+            scores.put(name, (Integer)scores.getOrDefault(name, 0) + points);
+        }
     }
 
     // Returns the list of all names.
@@ -63,5 +77,9 @@ public class NameManager {
     // Returns the map of scores for all names.
     public Map<String, Integer> getScores() {
         return scores;
+    }
+
+    public void appendName(String name){
+        pickedVictims.add(name);
     }
 }

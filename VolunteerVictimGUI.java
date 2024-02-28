@@ -15,6 +15,7 @@ public class VolunteerVictimGUI extends JFrame {
     private JLabel selectedVictimLabel; //  Displays the selected victim's name
     private JButton incrementVictimScoreButton; // Button to increment victim score
     private JButton decrementVictimScoreButton; //Button to decrement victim score
+    private JButton countAbsent; // Button to count absent
     private JButton pickRandomVictimButton; // Button to pick a random victim
     private JButton clearScores; // Button to clear scores
     private JTable leaderboard;
@@ -46,12 +47,15 @@ public class VolunteerVictimGUI extends JFrame {
         selectedVictimLabel = new JLabel(" "); //Label to display the chosen victim's name
         incrementVictimScoreButton = new JButton("+1");
         decrementVictimScoreButton = new JButton("-1");
+        countAbsent = new JButton("Mark Absent");
         incrementVictimScoreButton.setEnabled(false); // Initially disabled
         decrementVictimScoreButton.setEnabled(false);
+        countAbsent.setEnabled(false);
         middlePanel.add(pickRandomVictimButton);
         middlePanel.add(selectedVictimLabel); // Add label to panel
         middlePanel.add(incrementVictimScoreButton);
         middlePanel.add(decrementVictimScoreButton);
+        middlePanel.add(countAbsent);
 
         // Bottom Section - Leaderboard
         String[] columnNames = {"Name", "Score"};
@@ -70,7 +74,7 @@ public class VolunteerVictimGUI extends JFrame {
 
         //organizing TOP - volunteers and victims grouped
         JPanel topGroup = new JPanel(new FlowLayout());
-        JLabel spacing = new JLabel("                              ");
+        JLabel spacing = new JLabel("                   ");
         topGroup.add(topPanel,BorderLayout.NORTH);
         topGroup.add(spacing,BorderLayout.CENTER);
         topGroup.add(middlePanel,BorderLayout.SOUTH);
@@ -124,6 +128,7 @@ public class VolunteerVictimGUI extends JFrame {
                 selectedVictimLabel.setText(currentVictim); // Display the chosen victim's name
                 incrementVictimScoreButton.setEnabled(true);
                 decrementVictimScoreButton.setEnabled(true);
+                countAbsent.setEnabled(true);
             } else {
                 JOptionPane.showMessageDialog(this, "All victims have been picked.");
                 //Resets list of picked victims to empty
@@ -137,6 +142,7 @@ public class VolunteerVictimGUI extends JFrame {
                 updateLeaderboard();
                 incrementVictimScoreButton.setEnabled(false); // Optionally disable after increment
                 decrementVictimScoreButton.setEnabled(false);
+                countAbsent.setEnabled(false);
                 currentVictim = ""; // Reset current victim to ensure re-selection is required for more points
             }
         });
@@ -147,9 +153,22 @@ public class VolunteerVictimGUI extends JFrame {
                 updateLeaderboard();
                 incrementVictimScoreButton.setEnabled(false); // Optionally disable after increment
                 decrementVictimScoreButton.setEnabled(false);
+                countAbsent.setEnabled(false);
                 currentVictim = ""; // Reset current victim to ensure re-selection is required for more points
             }
         });
+
+
+        countAbsent.addActionListener((ActionEvent e) -> {
+            if (currentVictim != null && !currentVictim.isBlank()) {
+                //nameManager.setAbsences(currentVictim);
+                incrementVictimScoreButton.setEnabled(false); // Optionally disable after increment
+                decrementVictimScoreButton.setEnabled(false);
+                countAbsent.setEnabled(false);
+                currentVictim = ""; // Reset current victim to ensure re-selection is required for more points
+            }
+        });
+
     }
 
     private void updateLeaderboard() {

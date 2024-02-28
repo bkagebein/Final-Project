@@ -6,6 +6,7 @@ public class NameManager {
     // Set to store unique names of victims already chosen.
     private Set<String> pickedVictims;
     // Map to store scores associated with each name.
+    private List<String> absences; //List to store absences (names will be removed from allNames)
     private Map<String, Integer> scores;
 
     // Constructor initializes the NameManager with a list of names.
@@ -13,6 +14,7 @@ public class NameManager {
         this.allNames = new ArrayList<>(names); // Initialize with provided names.
         this.pickedVictims = new HashSet<>(); // Initialize empty set for victims.
         this.scores = new HashMap<>(); // Initialize empty map for scores.
+        this.absences = new ArrayList<>();
         // Set initial score of 0 for each name.
         for (String name : names) {
             scores.put(name, 0);
@@ -24,6 +26,7 @@ public class NameManager {
         // Create a list of names not yet picked as victims.
         List<String> possibleChoices = new ArrayList<>(allNames);
         possibleChoices.removeAll(pickedVictims); // Remove already picked victims.
+        possibleChoices.removeAll(absences);
 
         // If no names are left, return null.
         if (possibleChoices.isEmpty()) {
@@ -43,6 +46,7 @@ public class NameManager {
     public void resetList() {
         // Clear the set of picked victims.
         pickedVictims.clear();
+        absences.clear();
     }
 
     //Resets data, settings all scores to 0
@@ -73,6 +77,11 @@ public class NameManager {
     public List<String> getAllNames() {
         return allNames;
     }
+
+    public void setAbsences(String name){
+        absences.add(name);
+    }
+
 
     // Returns the map of scores for all names.
     public Map<String, Integer> getScores() {

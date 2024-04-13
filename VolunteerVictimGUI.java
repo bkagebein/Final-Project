@@ -3,6 +3,7 @@ import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.List;
 
 public class VolunteerVictimGUI extends JFrame {
@@ -177,6 +178,7 @@ public class VolunteerVictimGUI extends JFrame {
     }
 
     public static void main(String[] args) {
+
         List<String> names = List.of("Alice", "Bob", "Charlie", "Diana", "Edward");
         SwingUtilities.invokeLater(() -> new VolunteerVictimGUI(names).setVisible(true));
     }

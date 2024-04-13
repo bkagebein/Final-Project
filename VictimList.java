@@ -7,17 +7,24 @@ import java.util.*;
 public class VictimList {
     //Master list of names to be selected from.
     List<Victim> listOfNames;
+    //List of Students that are going to be picked from
+    private List<String> allNames;
+    // Set of names of the victims that have already been picked
+    private Set<String> pickedVictims;
+
     //List of all students who are absent
-    List<Victim> absent;
+    List<String> absent;
     //File where the names come from.
     File file;
 
     public VictimList() {
-        listOfNames = new ArrayList<Victim>();
-        absent = new ArrayList<Victim>();
+        this.listOfNames = new ArrayList<Victim>();
+        this.absent = new ArrayList<String>();
+        this.allNames = new ArrayList<>();
+        this.pickedVictims = new HashSet<>();
         file = new File("Names.txt");
-        try{
-            if(!file.exists()) {
+        try {
+            if (!file.exists()) {
                 throw new FileNotFoundException("File not found: " + file.getAbsolutePath());
             }
         } catch (FileNotFoundException e) {
@@ -28,9 +35,9 @@ public class VictimList {
     //Reads the names from the file, creates Victim objects based on the names
     //Stores the created victims in the listOfNames
     public void importNames() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))){
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
-            while((line = reader.readLine()) != null){
+            while ((line = reader.readLine()) != null) {
                 listOfNames.add(createVictim(line));
             }
         } catch (FileNotFoundException e) {
@@ -45,7 +52,7 @@ public class VictimList {
     //This method adds a name to the file
     //Then adds the new name to the arrayList of names.
     public void addNametoFile(String name) {
-        try (FileWriter writer = new FileWriter(file, true);){
+        try (FileWriter writer = new FileWriter(file, true);) {
             writer.write(name);
             System.out.println("Data appended to the file. ");
         } catch (IOException e) {
@@ -62,12 +69,12 @@ public class VictimList {
         //Reads the names and writes those names to the dummy file,while searching for a specific name to remove.
         //Once it finds the name, it doesn't write the selected name to a file, and continues reading the file.
         //It then saves the temp file as the names file.
-        try(BufferedReader reader = new BufferedReader(new FileReader(file));
-            BufferedWriter writer = new BufferedWriter(new FileWriter("temp.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(file));
+             BufferedWriter writer = new BufferedWriter(new FileWriter("temp.txt"))) {
             String currentLine;
 
             while ((currentLine = reader.readLine()) != null) {
-                if(!currentLine.equals(name.getName())) {
+                if (!currentLine.equals(name.getName())) {
                     writer.write(currentLine);
                     writer.newLine();
                 }
@@ -92,41 +99,61 @@ public class VictimList {
     //Adds a victim to the absent ArrayList.
     //Also removes them from the master list. (This can be changed if need be)
     public void updateAbsent(Victim vic) {
-        if(vic.getIsAbsent()){
-            absent.add(vic);
+        if (vic.getIsAbsent()) {
+            absent.add(vic.getName());
             listOfNames.remove(vic);
-        }
-        else {
+        } else {
             vic.setIsAbsent(true);
-            absent.add(vic);
+            absent.add(vic.getName());
             listOfNames.remove(vic);
         }
     }
 
-    public Victim victimPicker() {
-        Random random = new Random();
-        int min = 0;
-        int max = listOfNames.size();
-        int randomIndex = random.nextInt(max - min + 1) + min;
-        return listOfNames.get(randomIndex);
+    public String victimPicker() {
+        List<String> possibleChoices = new ArrayList<>(this.allNames);
+        possibleChoices.removeAll(this.pickedVictims);
+        possibleChoices.removeAll(this.absent);
+        if (possibleChoices.isEmpty()) {
+            return null;
+        } else {
+            Collections.shuffle(possibleChoices);
+            String pickedName = (String)possibleChoices.get(0);
+            this.pickedVictims.add(pickedName);
+            return pickedName;
+        }
+    }
+    //Once all victims have been picked you can call this to reset the Victims
+    public void resetList() {
+        this.pickedVictims.clear();
+        this.absent.clear();
     }
 
     //Displays all the elements of the ArrayList.
     public void displayVictims() {
-        for(Victim vic : listOfNames) {
+        for (Victim vic : listOfNames) {
             System.out.println(vic.getName());
         }
     }
+
     //Displays all the elements of the absent ArrayList.
     public void displayAbsent() {
-        for(Victim vic : absent) {
-            System.out.println(vic.getName());
+        for (String vic : absent) {
+            System.out.println(vic);
         }
     }
+
     //Creates a victim object.
     public Victim createVictim(String name) {
         Victim vic = new Victim(name);
         return vic;
     }
+
+    // Sets all the names into an array list of Strings
+    public void setAllNames(){
+        for (int i = 0; i < this.listOfNames.size(); i++) {
+            this.allNames.add(this.listOfNames.get(i).name);
+        }
+    }
+
 
 }

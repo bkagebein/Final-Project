@@ -1,3 +1,4 @@
+//NameManager.java
 import java.util.*;
 
 public class NameManager {

@@ -1,92 +1,93 @@
+// Timer.java
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
+import javax.sound.sampled.*;
+
 public class Timer extends JPanel {
-    //Label that displays the remaining time.
-    private JLabel timerLabel;
-    //Button that sets the timer to 10 seconds
-    private JButton tenButton;
-    //Button that sets the timer to 30 seconds
-    private JButton thirtyButton;
-    //Button that sets the timer to 60 seconds
-    private JButton minuteButton;
-    //Button that starts the timer
-    private JButton StartButton;
-    //button that stops the timer
-    private JButton StopButton;
-    //This variable will display the remain time.
-    private int counter;
-    //This is the timer object.
-    private javax.swing.Timer timer;
+    JLabel timerLabel;
+    JLabel displayTimerLabel;
+    JButton startButton;
+    JButton stopButton;
+    JButton resetButton;
+    final Clip[] clip = {null};
+    final int[] seconds = {0};
+    final javax.swing.Timer[] timer = {null};
+
     public Timer() {
-        //initialize the counter to 0
-        counter = 0;
+        timerLabel = new JLabel("Timer:");
+        displayTimerLabel = new JLabel("00:00");
+        startButton = new JButton("Start");
+        stopButton = new JButton("Stop");
+        resetButton = new JButton("Reset");
 
-        //instantiate Labels and buttons.
-        timerLabel = new JLabel("Timer: " + counter);
-        tenButton = new JButton("10s");
-        thirtyButton = new JButton("30s");
-        minuteButton = new JButton("60s");
-        StartButton = new JButton("Start Timer");
-        StopButton = new JButton("Stop Timer");
-
-        //Add label to panel
         this.add(timerLabel);
-        this.add(tenButton);
-        this.add(thirtyButton);
-        this.add(minuteButton);
-        this.add(StartButton);
-        this.add(StopButton);
+        this.add(displayTimerLabel);
+        this.add(startButton);
+        this.add(stopButton);
+        this.add(resetButton);
 
+        try {
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File("fart.wav"));
+            clip[0] = AudioSystem.getClip();
+            clip[0].open(audioInputStream);
+        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException ex) {
+            ex.printStackTrace();
+        }
 
-        //create button action listeners
-        tenButton.addActionListener((ActionEvent e) -> {
-            setCounter(10);
-            timerLabel.setText("Timer: 10");
-        });
-
-        thirtyButton.addActionListener((ActionEvent e) -> {
-            setCounter(30);
-            timerLabel.setText("Timer: 30");
-        });
-
-        minuteButton.addActionListener((ActionEvent e) -> {
-            setCounter(60);
-            timerLabel.setText("Timer: 60");
-        });
-
-        StartButton.addActionListener(e ->StartTimer());
-        StopButton.addActionListener(e->StopTimer());
-    }
-    //Setter for Counter variable.
-    public void setCounter(int counter) {
-        this.counter = counter;
-    }
-
-    //Function that will start the timer. Every second the counter variable will decrement.
-    private void StartTimer() {
-        timer = new javax.swing.Timer(1000, new ActionListener() {
+        startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(counter <= 1) {
-                    StopTimer();
+                if (clip[0] != null) {
+                    clip[0].stop();
+                    clip[0].setFramePosition(0);
+                    clip[0].start();
                 }
-                counter--;
-                timerLabel.setText("Timer: " + counter);
-                if(counter == 0) {
-                    timerLabel.setText("Time's Up!");
-                    StopTimer();
+                if (timer[0] == null) {
+                    timer[0] = new javax.swing.Timer(1000, new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            seconds[0]++;
+                            displayTimerLabel.setText(String.format("%02d:%02d", seconds[0] / 60, seconds[0] % 60));
+                        }
+                    });
+                    timer[0].start();
                 }
             }
         });
-        timer.start();
-    }
-    //Function that stops the timer.
-    private void StopTimer() {
-        if(timer != null && timer.isRunning()) {
-            timer.stop();
-        }
-    }
 
+        stopButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (clip[0] != null) {
+                    clip[0].stop();
+                    clip[0].setFramePosition(0);
+                    clip[0].start();
+                }
+                if (timer[0] != null) {
+                    timer[0].stop();
+                    timer[0] = null;
+                }
+            }
+        });
+
+        resetButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (clip[0] != null) {
+                    clip[0].stop();
+                    clip[0].setFramePosition(0);
+                    clip[0].start();
+                }
+                seconds[0] = 0;
+                displayTimerLabel.setText("00:00");
+                if (timer[0] != null) {
+                    timer[0].stop();
+                    timer[0] = null;
+                }
+            }
+        });
+    }
 }

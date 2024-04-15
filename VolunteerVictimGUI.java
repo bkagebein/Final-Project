@@ -3,6 +3,9 @@ import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +16,13 @@ public class VolunteerVictimGUI extends JFrame {
     private JLabel selectedVolunteerLabel; // Displays the selected volunteer's name
     private JButton incrementVolunteerScoreButton; // Button to increment volunteer score
     private JButton decrementVolunteerScoreButton; // Button to decrement volunteer score
+    private JTextField numberOfVictimsField;
+    private JLabel numberOfVictimsLabel;
+    private JList<String> selectedVictimsList; // To display multiple victims
+    private DefaultListModel<String> selectedVictimsModel; // Model to manage victims in JList
+    private JButton addButton; // Button to add victims
+    private JButton removeButton; // Button to remove selected victim
+
     private JLabel selectedVictimLabel; //  Displays the selected victim's name
     private JButton incrementVictimScoreButton; // Button to increment victim score
     private JButton decrementVictimScoreButton; //Button to decrement victim score
@@ -45,19 +55,27 @@ public class VolunteerVictimGUI extends JFrame {
         // Middle Section - Victim Selection and Score Increment
         JPanel middlePanel = new JPanel(new FlowLayout());
         pickRandomVictimButton = new JButton("Pick Random Victim");
-        selectedVictimLabel = new JLabel(" "); //Label to display the chosen victim's name
+        numberOfVictimsField = new JTextField(5);
+        numberOfVictimsLabel = new JLabel("Enter Number of Victims:");
+        selectedVictimsModel = new DefaultListModel<>();
+        selectedVictimsList = new JList<>(selectedVictimsModel); // Initialize JList with the model
+        JScrollPane victimsScrollPane = new JScrollPane(selectedVictimsList); // Add scroll pane for the list
+        victimsScrollPane.setPreferredSize(new Dimension(200, 100)); // Set preferred size for the scroll pane
+        addButton = new JButton("Add Victim");
+        removeButton = new JButton("Remove Victim");
+
         incrementVictimScoreButton = new JButton("+1");
         decrementVictimScoreButton = new JButton("-1");
         countAbsent = new JButton("Mark Absent");
-        incrementVictimScoreButton.setEnabled(false); // Initially disabled
-        decrementVictimScoreButton.setEnabled(false);
-        countAbsent.setEnabled(false);
+        middlePanel.add(numberOfVictimsLabel);
+        middlePanel.add(numberOfVictimsField);
         middlePanel.add(pickRandomVictimButton);
-        middlePanel.add(selectedVictimLabel); // Add label to panel
+        middlePanel.add(victimsScrollPane); // Add the scroll pane containing the list
+        middlePanel.add(addButton);
+        middlePanel.add(removeButton);
         middlePanel.add(incrementVictimScoreButton);
         middlePanel.add(decrementVictimScoreButton);
         middlePanel.add(countAbsent);
-
         // Bottom Section - Leaderboard
         String[] columnNames = {"Name", "Score"};
         leaderboardModel = new DefaultTableModel(columnNames, 0);
@@ -70,7 +88,7 @@ public class VolunteerVictimGUI extends JFrame {
 
         //TESTING
         JPanel clearPanel = new JPanel(new FlowLayout());
-        clearScores = new JButton("Clear Socres");
+        clearScores = new JButton("Clear Scores");
         clearPanel.add(clearScores);
 
         //organizing TOP - volunteers and victims grouped
@@ -124,18 +142,29 @@ public class VolunteerVictimGUI extends JFrame {
         });
 
         pickRandomVictimButton.addActionListener((ActionEvent e) -> {
-            currentVictim = nameManager.getRandomVictim();
-            if (currentVictim != null) {
-                selectedVictimLabel.setText(currentVictim); // Display the chosen victim's name
-                incrementVictimScoreButton.setEnabled(true);
-                decrementVictimScoreButton.setEnabled(true);
-                countAbsent.setEnabled(true);
-            } else {
-                JOptionPane.showMessageDialog(this, "All victims have been picked.");
-                //Resets list of picked victims to empty
-                nameManager.resetList();
+            selectedVictimsModel.clear();
+            int numberOfVictims;
+            try{
+                numberOfVictims = Integer.parseInt(numberOfVictimsField.getText());
+            }catch (NumberFormatException ex){
+                JOptionPane.showMessageDialog(this, "Enter a valid number of victims.");
+                return;
+            }
+            for(int i = 0; i < numberOfVictims; i++){
+                currentVictim = nameManager.getRandomVictim(); // Assuming this method picks a random victim
+                if (currentVictim != null) {
+                    selectedVictimsModel.addElement(currentVictim); // Add the picked victim to the JList
+                    incrementVictimScoreButton.setEnabled(true);
+                    decrementVictimScoreButton.setEnabled(true);
+                    countAbsent.setEnabled(true);
+                } else {
+                    JOptionPane.showMessageDialog(this, "All victims have been picked.");
+                    // Resets list of picked victims to empty
+                    nameManager.resetList();
+                }
             }
         });
+
 
         incrementVictimScoreButton.addActionListener((ActionEvent e) -> {
             if (currentVictim != null && !currentVictim.isBlank()) {
@@ -159,6 +188,20 @@ public class VolunteerVictimGUI extends JFrame {
             }
         });
 
+        addButton.addActionListener((ActionEvent e) -> {
+            String victim = JOptionPane.showInputDialog(this, "Enter Victim's Name:");
+            if (victim != null && !victim.trim().isEmpty()) {
+                selectedVictimsModel.addElement(victim.trim());
+            }
+        });
+
+        removeButton.addActionListener((ActionEvent e) -> {
+            int selectedIdx = selectedVictimsList.getSelectedIndex();
+            if (selectedIdx != -1) {
+                selectedVictimsModel.removeElementAt(selectedIdx);
+            }
+        });
+
 
         countAbsent.addActionListener((ActionEvent e) -> {
             if (currentVictim != null && !currentVictim.isBlank()) {
@@ -178,8 +221,21 @@ public class VolunteerVictimGUI extends JFrame {
     }
 
     public static void main(String[] args) {
-
-        List<String> names = List.of("Alice", "Bob", "Charlie", "Diana", "Edward");
+        String fileName = "Names.txt";
+        List<String> names = readNamesFromFile(fileName);
         SwingUtilities.invokeLater(() -> new VolunteerVictimGUI(names).setVisible(true));
+    }
+
+    public static List<String> readNamesFromFile(String fileName) {
+        List<String> names = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                names.add(line.trim()); // Add each line to the list, trimming whitespace
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return names;
     }
 }

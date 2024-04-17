@@ -167,25 +167,19 @@ public class VolunteerVictimGUI extends JFrame {
 
 
         incrementVictimScoreButton.addActionListener((ActionEvent e) -> {
-            if (currentVictim != null && !currentVictim.isBlank()) {
-                nameManager.updateScore(currentVictim, 1);
-                updateLeaderboard();
-                incrementVictimScoreButton.setEnabled(false); // Optionally disable after increment
-                decrementVictimScoreButton.setEnabled(false);
-                countAbsent.setEnabled(false);
-                currentVictim = ""; // Reset current victim to ensure re-selection is required for more points
+            List<String> selectedVictims = selectedVictimsList.getSelectedValuesList();
+            for (String victim : selectedVictims) {
+                nameManager.updateScore(victim, 1);
             }
+            updateLeaderboard();
         });
 
         decrementVictimScoreButton.addActionListener((ActionEvent e) -> {
-            if (currentVictim != null && !currentVictim.isBlank()) {
-                nameManager.updateScore(currentVictim, -1);
-                updateLeaderboard();
-                incrementVictimScoreButton.setEnabled(false); // Optionally disable after increment
-                decrementVictimScoreButton.setEnabled(false);
-                countAbsent.setEnabled(false);
-                currentVictim = ""; // Reset current victim to ensure re-selection is required for more points
+            List<String> selectedVictims = selectedVictimsList.getSelectedValuesList();
+            for (String victim : selectedVictims) {
+                nameManager.updateScore(victim, -1);
             }
+            updateLeaderboard();
         });
 
         addButton.addActionListener((ActionEvent e) -> {
@@ -204,13 +198,11 @@ public class VolunteerVictimGUI extends JFrame {
 
 
         countAbsent.addActionListener((ActionEvent e) -> {
-            if (currentVictim != null && !currentVictim.isBlank()) {
-                //nameManager.setAbsences(currentVictim);
-                incrementVictimScoreButton.setEnabled(false); // Optionally disable after increment
-                decrementVictimScoreButton.setEnabled(false);
-                countAbsent.setEnabled(false);
-                currentVictim = ""; // Reset current victim to ensure re-selection is required for more points
+            List<String> selectedVictims = selectedVictimsList.getSelectedValuesList();
+            for (String victim : selectedVictims) {
+                // nameManager.setAbsences(victim); // Uncomment this if needed
             }
+            selectedVictimsList.clearSelection();
         });
 
     }

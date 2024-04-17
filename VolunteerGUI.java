@@ -69,7 +69,7 @@ public class VolunteerGUI extends JFrame {
 
         //TESTING
         JPanel clearPanel = new JPanel(new FlowLayout());
-        clearScores = new JButton("Clear Socres");
+        clearScores = new JButton("Clear Scores");
         clearPanel.add(clearScores);
 
         //organizing TOP - volunteers and victims grouped

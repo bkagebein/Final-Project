@@ -130,9 +130,14 @@ public class VolunteerGUI extends JFrame {
                 decrementVictimScoreButton.setEnabled(true);
                 countAbsent.setEnabled(true);
             } else {
-                JOptionPane.showMessageDialog(this, "All victims have been picked.");
                 //Resets list of picked victims to empty
                 nameManager.resetList();
+                currentVictim = nameManager.getRandomVictim();
+                JOptionPane.showMessageDialog(this, "All victims have been picked, resetting and picking again..");
+                selectedVictimLabel.setText(currentVictim); // Display the chosen victim's name
+                incrementVictimScoreButton.setEnabled(true);
+                decrementVictimScoreButton.setEnabled(true);
+                countAbsent.setEnabled(true);
             }
         });
 

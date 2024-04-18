@@ -1,4 +1,3 @@
-// Timer.java
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -8,86 +7,120 @@ import javax.sound.sampled.*;
 
 public class Timer extends JPanel {
     JLabel timerLabel;
-    JLabel displayTimerLabel;
-    JButton startButton;
-    JButton stopButton;
-    JButton resetButton;
-    final Clip[] clip = {null};
-    final int[] seconds = {0};
-    final javax.swing.Timer[] timer = {null};
+    JButton tenButton, thirtyButton, minuteButton, startButton, stopButton, clearButton, phoneAFriendButton;
+    int counter, totalCounter;
+    javax.swing.Timer swingTimer;
+    Clip clip;
 
     public Timer() {
-        timerLabel = new JLabel("Timer:");
-        displayTimerLabel = new JLabel("00:00");
-        startButton = new JButton("Start");
-        stopButton = new JButton("Stop");
-        resetButton = new JButton("Reset");
+        setupUI();
+        setupAudio();
+        addActionListeners();
+    }
+
+    private void setupUI() {
+        timerLabel = new JLabel("Timer: " + counter);
+        tenButton = new JButton("10s");
+        thirtyButton = new JButton("30s");
+        minuteButton = new JButton("60s");
+        startButton = new JButton("Start Timer");
+        stopButton = new JButton("Stop Timer");
+        clearButton = new JButton("Clear Timer");
+        phoneAFriendButton = new JButton("Phone a Friend");
 
         this.add(timerLabel);
-        this.add(displayTimerLabel);
+        this.add(tenButton);
+        this.add(thirtyButton);
+        this.add(minuteButton);
         this.add(startButton);
         this.add(stopButton);
-        this.add(resetButton);
+        this.add(clearButton);
+        this.add(phoneAFriendButton);
+    }
 
+    private void setupAudio() {
         try {
             AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File("fart.wav"));
-            clip[0] = AudioSystem.getClip();
-            clip[0].open(audioInputStream);
+            clip = AudioSystem.getClip();
+            clip.open(audioInputStream);
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException ex) {
             ex.printStackTrace();
         }
+    }
 
-        startButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (clip[0] != null) {
-                    clip[0].stop();
-                    clip[0].setFramePosition(0);
-                    clip[0].start();
-                }
-                if (timer[0] == null) {
-                    timer[0] = new javax.swing.Timer(1000, new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            seconds[0]++;
-                            displayTimerLabel.setText(String.format("%02d:%02d", seconds[0] / 60, seconds[0] % 60));
-                        }
-                    });
-                    timer[0].start();
-                }
-            }
-        });
+    private void addActionListeners() {
+        tenButton.addActionListener(this::addTime);
+        thirtyButton.addActionListener(this::addTime);
+        minuteButton.addActionListener(this::addTime);
+        startButton.addActionListener(e -> startTimer());
+        stopButton.addActionListener(e -> stopTimer());
+        clearButton.addActionListener(e -> clearTimer());
+        phoneAFriendButton.addActionListener(e -> phoneAFriend());
+    }
 
-        stopButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (clip[0] != null) {
-                    clip[0].stop();
-                    clip[0].setFramePosition(0);
-                    clip[0].start();
-                }
-                if (timer[0] != null) {
-                    timer[0].stop();
-                    timer[0] = null;
-                }
-            }
-        });
+    private void addTime(ActionEvent e) {
+        int value = Integer.parseInt(((JButton) e.getSource()).getText().replaceAll("s", ""));
+        totalCounter += value;
+        counter = totalCounter;
+        timerLabel.setText("Timer: " + counter);
+        playSound();
+    }
 
-        resetButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (clip[0] != null) {
-                    clip[0].stop();
-                    clip[0].setFramePosition(0);
-                    clip[0].start();
+    private void startTimer() {
+        if (swingTimer == null || !swingTimer.isRunning()) {
+            swingTimer = new javax.swing.Timer(1000, e -> {
+                if (counter <= 0) {
+                    timerLabel.setText("Time's Up!");
+                    stopTimer();
+                    clearTimer(); // Reset the timer automatically when time is up
+                } else {
+                    counter--;
+                    timerLabel.setText("Timer: " + counter);
                 }
-                seconds[0] = 0;
-                displayTimerLabel.setText("00:00");
-                if (timer[0] != null) {
-                    timer[0].stop();
-                    timer[0] = null;
-                }
+            });
+            swingTimer.start();
+        }
+        playSound();
+    }
+
+
+    private void stopTimer() {
+        if (swingTimer != null && swingTimer.isRunning()) {
+            swingTimer.stop();
+        }
+        playSound();
+    }
+
+    private void clearTimer() {
+        totalCounter = 0;
+        counter = 0;
+        timerLabel.setText("Timer: " + counter);
+        if (swingTimer != null) {
+            swingTimer.stop();
+        }
+        playSound();
+    }
+
+    private void phoneAFriend() {
+        if (swingTimer != null && swingTimer.isRunning()) {
+            swingTimer.stop(); // Pause the timer
+            try {
+                Thread.sleep(15000); // Pause for 15 seconds
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
             }
-        });
+            if (counter > 0) {
+                swingTimer.start(); // Resume the timer
+            }
+            playSound();
+        }
+    }
+
+    private void playSound() {
+        if (clip != null) {
+            clip.stop();
+            clip.setFramePosition(0);
+            clip.start();
+        }
     }
 }

@@ -1,5 +1,5 @@
-//NameManager.java
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class NameManager {
     // List to store all possible names.
@@ -7,7 +7,7 @@ public class NameManager {
     // Set to store unique names of victims already chosen.
     private Set<String> pickedVictims;
     // Map to store scores associated with each name.
-    private List<String> absences; //List to store absences (names will be removed from allNames)
+    private Map<String, Integer> absences; //Map to store absences (names will be removed from allNames)
     private Map<String, Integer> scores;
 
     // Constructor initializes the NameManager with a list of names.
@@ -15,10 +15,11 @@ public class NameManager {
         this.allNames = new ArrayList<>(names); // Initialize with provided names.
         this.pickedVictims = new HashSet<>(); // Initialize empty set for victims.
         this.scores = new HashMap<>(); // Initialize empty map for scores.
-        this.absences = new ArrayList<>();
+        this.absences = new HashMap<>();
         // Set initial score of 0 for each name.
         for (String name : names) {
             scores.put(name, 0);
+            absences.put(name, 0);  // Initialize absences
         }
     }
 
@@ -27,7 +28,7 @@ public class NameManager {
         // Create a list of names not yet picked as victims.
         List<String> possibleChoices = new ArrayList<>(allNames);
         possibleChoices.removeAll(pickedVictims); // Remove already picked victims.
-        possibleChoices.removeAll(absences);
+        possibleChoices.removeAll(getAbsentNames());  // Remove absent names
 
         // If no names are left, return null.
         if (possibleChoices.isEmpty()) {
@@ -50,7 +51,7 @@ public class NameManager {
         absences.clear();
     }
 
-    //Resets data, settings all scores to 0
+    // Resets data, settings all scores to 0
     public void resetScores(){
         // Reset each name's score to 0.
         for (String name : scores.keySet()) {
@@ -60,36 +61,40 @@ public class NameManager {
 
     // Updates the score for a given name.
     public void updateScore(String name, int points) {
-        //if points results in score going below 0, dont add points
-        if (scores.get(name) <= 0 && (points < 0)){
+        // if points result in score going below 0, don't add points
+        if (scores.get(name) <= 0 && points < 0) {
             scores.put(name, 0);
-            //scores.put(name, (Integer)scores.getOrDefault(name, 0));
-        }
-        else if(scores.get(name) + points < 0){
+        } else if (scores.get(name) + points < 0) {
             scores.put(name, 0);
-        }
-        //add points to score!
-        else{
-            scores.put(name, (Integer)scores.getOrDefault(name, 0) + points);
+        } else {
+            scores.put(name, scores.getOrDefault(name, 0) + points);
         }
     }
 
-    // Returns the list of all names.
+    public void incrementAbsence(String name) {
+        absences.put(name, absences.getOrDefault(name, 0) + 1);  // Increment absence
+    }
+
     public List<String> getAllNames() {
         return allNames;
     }
 
-    public void setAbsences(String name){
-        absences.add(name);
-    }
-
-
-    // Returns the map of scores for all names.
     public Map<String, Integer> getScores() {
         return scores;
     }
 
-    public void appendName(String name){
+    public Map<String, Integer> getAbsences() {
+        return absences;  // Get absences
+    }
+
+    public void appendName(String name) {
         pickedVictims.add(name);
+    }
+
+    public List<String> getAbsentNames() {
+        return absences.entrySet().stream()
+                .filter(entry -> entry.getValue() > 0)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
     }
 }

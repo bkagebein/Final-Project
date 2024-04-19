@@ -77,7 +77,7 @@ public class VolunteerVictimGUI extends JFrame {
         middlePanel.add(decrementVictimScoreButton);
         middlePanel.add(countAbsent);
         // Bottom Section - Leaderboard
-        String[] columnNames = {"Name", "Score"};
+        String[] columnNames = {"Name", "Score", "Absences"};  // Added "Absences" column
         leaderboardModel = new DefaultTableModel(columnNames, 0);
         leaderboard = new JTable(leaderboardModel);
         JScrollPane leaderboardScrollPane = new JScrollPane(leaderboard);
@@ -200,16 +200,21 @@ public class VolunteerVictimGUI extends JFrame {
         countAbsent.addActionListener((ActionEvent e) -> {
             List<String> selectedVictims = selectedVictimsList.getSelectedValuesList();
             for (String victim : selectedVictims) {
-                // nameManager.setAbsences(victim); // Uncomment this if needed
+                nameManager.incrementAbsence(victim);  // Increment absences
             }
-            selectedVictimsList.clearSelection();
+            updateLeaderboard();
+            selectedVictimsList.clearSelection();  // Clear selection
         });
+
 
     }
 
     private void updateLeaderboard() {
         leaderboardModel.setRowCount(0);
-        nameManager.getScores().forEach((name, score) -> leaderboardModel.addRow(new Object[]{name, score}));
+        nameManager.getScores().forEach((name, score) -> {
+            Integer absences = nameManager.getAbsences().getOrDefault(name, 0);  // Get absences
+            leaderboardModel.addRow(new Object[]{name, score, absences});  // Add absences to the row
+        });
     }
 
     public static void main(String[] args) {

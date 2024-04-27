@@ -101,20 +101,12 @@ public class Timer extends JPanel {
         playSound();
     }
 
-    private void phoneAFriend() {
+    private void phoneAFriend()  {
         if (swingTimer != null && swingTimer.isRunning()) {
             swingTimer.stop(); // Pause the timer
-            try {
-                Thread.sleep(15000); // Pause for 15 seconds
-            } catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
+                playSound();
             }
-            if (counter > 0) {
-                swingTimer.start(); // Resume the timer
-            }
-            playSound();
         }
-    }
 
     private void playSound() {
         if (clip != null) {
@@ -124,3 +116,4 @@ public class Timer extends JPanel {
         }
     }
 }
+

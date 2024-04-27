@@ -4,13 +4,18 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class VolunteerVictimGUI extends JFrame {
 
+    private int questionCounter = -1;
+    private ArrayList<String> questions;
     private NameManager nameManager;
     private JComboBox<String> volunteerDropdown;
     private JLabel selectedVolunteerLabel; // Displays the selected volunteer's name
@@ -20,8 +25,12 @@ public class VolunteerVictimGUI extends JFrame {
     private JLabel numberOfVictimsLabel;
     private JList<String> selectedVictimsList; // To display multiple victims
     private DefaultListModel<String> selectedVictimsModel; // Model to manage victims in JList
+    private DefaultListModel<String> questionPanelModel; // model to manage questions in Jlist
     private JButton addButton; // Button to add victims
     private JButton removeButton; // Button to remove selected victim
+
+    private JButton nextQuestion;
+    private JButton prevQuestion;
 
     private JLabel selectedVictimLabel; //  Displays the selected victim's name
     private JButton incrementVictimScoreButton; // Button to increment victim score
@@ -39,6 +48,14 @@ public class VolunteerVictimGUI extends JFrame {
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
+
+        //Question panel
+        JLabel questionLabel = new JLabel("Loading Questions",JLabel.CENTER);
+        questionLabel.setPreferredSize(new Dimension(1, 1));
+        questionLabel.setFont(new Font("Serif", Font.BOLD, 69));
+        String fileName = "C:\\Users\\Gavin\\IdeaProjects\\Final-Project\\Question List.txt";
+        this.questions = importQuestionsFromFile(fileName);
+
 
         // Top Section - Volunteer Dropdown and Display
         JPanel topPanel = new JPanel(new FlowLayout());
@@ -59,10 +76,20 @@ public class VolunteerVictimGUI extends JFrame {
         numberOfVictimsLabel = new JLabel("Enter Number of Victims:");
         selectedVictimsModel = new DefaultListModel<>();
         selectedVictimsList = new JList<>(selectedVictimsModel); // Initialize JList with the model
+        //Question panel
+        questionPanelModel = new DefaultListModel<>();
+        //questionsList = new JList<>(questionPanelModel);
+        //questionsList.setPreferredSize(new Dimension(500,300));
+        //questionsBox = new JTextPane(questionPanelModel);
         JScrollPane victimsScrollPane = new JScrollPane(selectedVictimsList); // Add scroll pane for the list
         victimsScrollPane.setPreferredSize(new Dimension(200, 100)); // Set preferred size for the scroll pane
         addButton = new JButton("Add Victim");
         removeButton = new JButton("Remove Victim");
+
+
+        nextQuestion = new JButton("Next Question");
+        prevQuestion = new JButton("Prev. Question");
+        prevQuestion.setEnabled(false);
 
         incrementVictimScoreButton = new JButton("+1");
         decrementVictimScoreButton = new JButton("-1");
@@ -76,6 +103,10 @@ public class VolunteerVictimGUI extends JFrame {
         middlePanel.add(incrementVictimScoreButton);
         middlePanel.add(decrementVictimScoreButton);
         middlePanel.add(countAbsent);
+        middlePanel.add(questionLabel);
+        middlePanel.add(nextQuestion);
+        middlePanel.add(prevQuestion);
+        //middlePanel.add(questionsList);
         // Bottom Section - Leaderboard
         String[] columnNames = {"Name", "Score", "Absences"};  // Added "Absences" column
         leaderboardModel = new DefaultTableModel(columnNames, 0);
@@ -102,6 +133,10 @@ public class VolunteerVictimGUI extends JFrame {
         JPanel midGroup = new JPanel(new BorderLayout());
         midGroup.add(timerPanel,BorderLayout.NORTH);
         midGroup.add(clearPanel, BorderLayout.SOUTH);
+        midGroup.add(questionLabel, BorderLayout.CENTER);
+        midGroup.add(nextQuestion, BorderLayout.EAST);
+        midGroup.add(prevQuestion, BorderLayout.WEST);
+        //midGroup.add(questionsList, BorderLayout.CENTER);
 
         //organizing BOTTOM - board and clearScores grouped
         JPanel bottomGroup = new JPanel(new BorderLayout());
@@ -113,6 +148,40 @@ public class VolunteerVictimGUI extends JFrame {
         add(bottomGroup, BorderLayout.SOUTH);
 
         // Event Listeners
+        nextQuestion.addActionListener((ActionEvent e) -> {
+            if (this.questionCounter + 1 < questions.size()) {
+                this.questionCounter = questionCounter + 1;
+                questionLabel.setText("<html>" + questions.get(this.questionCounter) + "</html>");
+                if (questionCounter > 0 ) {
+                    prevQuestion.setEnabled(true);
+                }
+                if (this.questionCounter + 1 >= questions.size()) {
+                    nextQuestion.setEnabled(false);
+                    prevQuestion.setEnabled(true);
+                }
+            } else {
+                nextQuestion.setEnabled(false);
+
+            }
+        });
+
+        prevQuestion.addActionListener((ActionEvent e) -> {
+            if (this.questionCounter - 1 >= 0) {
+                this.questionCounter = questionCounter - 1;
+                questionLabel.setText("<html>" + questions.get(this.questionCounter) + "</html>");
+                if (questionCounter < questions.size() ) {
+                    nextQuestion.setEnabled(true);
+                }
+                if (this.questionCounter - 1 < 0) {
+
+                    prevQuestion.setEnabled(false);
+                }
+            } else {
+                prevQuestion.setEnabled(false);
+                nextQuestion.setEnabled(true);
+            }
+        });
+
         clearScores.addActionListener((ActionEvent e) -> {
             nameManager.resetScores();
             updateLeaderboard();
@@ -234,5 +303,24 @@ public class VolunteerVictimGUI extends JFrame {
             e.printStackTrace();
         }
         return names;
+    }
+
+    public static ArrayList<String> importQuestionsFromFile(String fileName) {
+        Scanner fileScan = null;
+        ArrayList <String> questions = new ArrayList<>();
+        try
+        {
+            fileScan = new Scanner(new File(fileName), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+            while (true) {
+                assert fileScan != null;
+                if (!fileScan.hasNext()) break;
+                questions.add(fileScan.nextLine());
+            }
+            return questions;
+
+
     }
 }

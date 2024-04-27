@@ -1,27 +1,30 @@
+import javax.swing.*;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-public class QuestionList {
-    private List<Question> listOfQuestions;
+public class QuestionList  {
+    public  List<Question> listOfQuestions;
 
-    public QuestionList() {
-        listOfQuestions = new ArrayList<>();
-    }
+    String filename = "Question List.txt";
 
-    public void importQuestionsFromFile(String fileName) {
-        File questionFile = new File(fileName);
-        try (BufferedReader reader = new BufferedReader(new FileReader(questionFile))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                addQuestion(line);
-            }
-        } catch (FileNotFoundException e) {
-            System.out.println("Error: File not found.");
-            e.printStackTrace();
-        } catch (IOException e) {
-            System.out.println("Error while reading the file.");
-            e.printStackTrace();
+    public ArrayList<String> importQuestionsFromFile(String fileName) {
+        ArrayList<String> questions = new ArrayList<>();
+        Scanner fileScan;
+        try
+        {
+            fileScan = new Scanner(new File(fileName), StandardCharsets.UTF_8);
+        } catch (IOException e)
+        {
+            return questions;
         }
+
+        while (fileScan.hasNext())
+        {
+            questions.add(fileScan.nextLine());
+        }
+        return questions;
+
     }
 
     public void addQuestion(String questionText) {

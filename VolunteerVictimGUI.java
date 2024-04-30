@@ -3,10 +3,7 @@ import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,8 +50,13 @@ public class VolunteerVictimGUI extends JFrame {
         JLabel questionLabel = new JLabel("Loading Questions",JLabel.CENTER);
         questionLabel.setPreferredSize(new Dimension(1, 1));
         questionLabel.setFont(new Font("Serif", Font.BOLD, 69));
-        String fileName = "C:\\Users\\Gavin\\IdeaProjects\\Final-Project\\Question List.txt";
+        System.out.println(new File(".").getAbsolutePath());
+        System.out.println("Working Directory = " + System.getProperty("user.dir"));
+
+        String fileName = "Question List.txt";
         this.questions = importQuestionsFromFile(fileName);
+        //String fileName = "C:\\Users\\Gavin\\IdeaProjects\\Final-Project\\Question List.txt";
+        //this.questions = importQuestionsFromFile(fileName);
 
 
         // Top Section - Volunteer Dropdown and Display
@@ -292,6 +294,7 @@ public class VolunteerVictimGUI extends JFrame {
         SwingUtilities.invokeLater(() -> new VolunteerVictimGUI(names).setVisible(true));
     }
 
+
     public static List<String> readNamesFromFile(String fileName) {
         List<String> names = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
@@ -306,21 +309,19 @@ public class VolunteerVictimGUI extends JFrame {
     }
 
     public static ArrayList<String> importQuestionsFromFile(String fileName) {
-        Scanner fileScan = null;
-        ArrayList <String> questions = new ArrayList<>();
-        try
-        {
-            fileScan = new Scanner(new File(fileName), StandardCharsets.UTF_8);
+        ArrayList<String> questions = new ArrayList<>();
+        try (Scanner fileScan = new Scanner(new File(fileName), StandardCharsets.UTF_8)) {
+            while (fileScan.hasNextLine()) {
+                questions.add(fileScan.nextLine());
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
-            while (true) {
-                assert fileScan != null;
-                if (!fileScan.hasNext()) break;
-                questions.add(fileScan.nextLine());
-            }
-            return questions;
-
-
+        return questions;
     }
+
+
+
+
 }
+

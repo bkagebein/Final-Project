@@ -1,8 +1,9 @@
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ public class VolunteerVictimGUI extends JFrame {
 
     private int questionCounter = -1;
     private ArrayList<String> questions;
+    public ArrayList<Victim> victims;
     private NameManager nameManager;
     private JComboBox<String> volunteerDropdown;
     private JLabel selectedVolunteerLabel; // Displays the selected volunteer's name
@@ -25,6 +27,7 @@ public class VolunteerVictimGUI extends JFrame {
     private DefaultListModel<String> questionPanelModel; // model to manage questions in Jlist
     private JButton addButton; // Button to add victims
     private JButton removeButton; // Button to remove selected victim
+
 
     private JButton nextQuestion;
     private JButton prevQuestion;
@@ -39,12 +42,21 @@ public class VolunteerVictimGUI extends JFrame {
     private DefaultTableModel leaderboardModel;
     private String currentVictim; // Tracks the currently selected victim
 
-    public VolunteerVictimGUI(List<String> names) {
-        nameManager = new NameManager(names);
+    public VolunteerVictimGUI(ArrayList<Victim> names) {
+        this.victims = names;
+        nameManager = new NameManager(victims);
         setTitle("Volunteer & Victim Management");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                // Call the method to write victims to a file
+                updateFile(victims);
+            }
+        });
 
         //Question panel
         JLabel questionLabel = new JLabel("Loading Questions",JLabel.CENTER);
@@ -55,8 +67,6 @@ public class VolunteerVictimGUI extends JFrame {
 
         String fileName = "Question List.txt";
         this.questions = importQuestionsFromFile(fileName);
-        //String fileName = "C:\\Users\\Gavin\\IdeaProjects\\Final-Project\\Question List.txt";
-        //this.questions = importQuestionsFromFile(fileName);
 
 
         // Top Section - Volunteer Dropdown and Display
@@ -80,9 +90,6 @@ public class VolunteerVictimGUI extends JFrame {
         selectedVictimsList = new JList<>(selectedVictimsModel); // Initialize JList with the model
         //Question panel
         questionPanelModel = new DefaultListModel<>();
-        //questionsList = new JList<>(questionPanelModel);
-        //questionsList.setPreferredSize(new Dimension(500,300));
-        //questionsBox = new JTextPane(questionPanelModel);
         JScrollPane victimsScrollPane = new JScrollPane(selectedVictimsList); // Add scroll pane for the list
         victimsScrollPane.setPreferredSize(new Dimension(200, 100)); // Set preferred size for the scroll pane
         addButton = new JButton("Add Victim");
@@ -185,7 +192,7 @@ public class VolunteerVictimGUI extends JFrame {
         });
 
         clearScores.addActionListener((ActionEvent e) -> {
-            nameManager.resetScores();
+            nameManager.resetScores(victims);
             updateLeaderboard();
         });
 
@@ -199,7 +206,7 @@ public class VolunteerVictimGUI extends JFrame {
         incrementVolunteerScoreButton.addActionListener((ActionEvent e) -> {
             String selectedVolunteer = (String) volunteerDropdown.getSelectedItem();
             if (selectedVolunteer != null && !selectedVolunteer.trim().isEmpty()) {
-                nameManager.updateScore(selectedVolunteer, 2);
+                nameManager.updateScore(victims, selectedVolunteer, 2);
                 updateLeaderboard();
             }
         });
@@ -207,7 +214,7 @@ public class VolunteerVictimGUI extends JFrame {
         decrementVolunteerScoreButton.addActionListener((ActionEvent e) -> {
             String selectedVolunteer = (String) volunteerDropdown.getSelectedItem();
             if (selectedVolunteer != null && !selectedVolunteer.trim().isEmpty()) {
-                nameManager.updateScore(selectedVolunteer, -2);
+                nameManager.updateScore(victims, selectedVolunteer, -2);
                 updateLeaderboard();
             }
         });
@@ -240,7 +247,7 @@ public class VolunteerVictimGUI extends JFrame {
         incrementVictimScoreButton.addActionListener((ActionEvent e) -> {
             List<String> selectedVictims = selectedVictimsList.getSelectedValuesList();
             for (String victim : selectedVictims) {
-                nameManager.updateScore(victim, 1);
+                nameManager.updateScore(victims, victim, 1);
             }
             updateLeaderboard();
         });
@@ -248,7 +255,7 @@ public class VolunteerVictimGUI extends JFrame {
         decrementVictimScoreButton.addActionListener((ActionEvent e) -> {
             List<String> selectedVictims = selectedVictimsList.getSelectedValuesList();
             for (String victim : selectedVictims) {
-                nameManager.updateScore(victim, -1);
+                nameManager.updateScore(victims, victim, -1);
             }
             updateLeaderboard();
         });
@@ -271,7 +278,7 @@ public class VolunteerVictimGUI extends JFrame {
         countAbsent.addActionListener((ActionEvent e) -> {
             List<String> selectedVictims = selectedVictimsList.getSelectedValuesList();
             for (String victim : selectedVictims) {
-                nameManager.incrementAbsence(victim);  // Increment absences
+                nameManager.incrementAbsence(victims, victim);  // Increment absences
             }
             updateLeaderboard();
             selectedVictimsList.clearSelection();  // Clear selection
@@ -289,24 +296,18 @@ public class VolunteerVictimGUI extends JFrame {
     }
 
     public static void main(String[] args) {
-        String fileName = "Names.txt";
-        List<String> names = readNamesFromFile(fileName);
-        SwingUtilities.invokeLater(() -> new VolunteerVictimGUI(names).setVisible(true));
-    }
-
-
-    public static List<String> readNamesFromFile(String fileName) {
-        List<String> names = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                names.add(line.trim()); // Add each line to the list, trimming whitespace
-            }
+        ArrayList<Victim> victims = null;
+        try {
+            victims = ReadVictimsFromFile.readVictimsFromFile("C:\\Users\\Lanmine\\Desktop\\Final-Project\\Names.txt");
         } catch (IOException e) {
             e.printStackTrace();
+            // Handle the exception as needed (e.g., show an error message)
         }
-        return names;
+        ArrayList<Victim> finalVictims = victims;
+        SwingUtilities.invokeLater(() -> new VolunteerVictimGUI(finalVictims).setVisible(true));
     }
+
+
 
     public static ArrayList<String> importQuestionsFromFile(String fileName) {
         ArrayList<String> questions = new ArrayList<>();
@@ -320,8 +321,7 @@ public class VolunteerVictimGUI extends JFrame {
         return questions;
     }
 
-
-
-
+    public static void updateFile(ArrayList<Victim> victims){
+        ReadVictimsFromFile.writeVictimsToFile(victims, "Names.txt");
+    }
 }
-

@@ -1,12 +1,12 @@
-Levi Landers
-Nicholas Colet
-Danny Barmanbekov
-Nate Benson
-Akhil John Bosco
-Jeremiah Jordan
-Bret Kagebein
-Reagan Kohler
-Chandler Mason
-Matthew McCallister
-Oluwatobiloba Olaoye
-Gavin Smith
+Levi Landers,8,0,0
+Nicholas Colet,0,0,0
+Danny Barmanbekov,0,0,0
+Nate Benson,0,0,0
+Akhil John Bosco,0,0,0
+Jeremiah Jordan,0,0,0
+Bret Kagebein,0,0,0
+Reagan Kohler,0,0,0
+Chandler Mason,0,0,0
+Matthew McCallister,0,0,0
+Oluwatobiloba Olaoye,0,0,0
+Gavin Smith,0,0,0

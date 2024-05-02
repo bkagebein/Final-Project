@@ -73,7 +73,7 @@ public class VolunteerVictimGUI extends JFrame {
 
 
         // Top Section - Volunteer Dropdown and Display
-        FlowLayout topLayout = new FlowLayout(FlowLayout.LEFT, 20, 5); // increased horizontal and vertical gaps
+        FlowLayout topLayout = new FlowLayout(FlowLayout.LEFT, 15, 5); // increased horizontal and vertical gaps
         JPanel topPanel = new JPanel(topLayout);
         volunteerDropdown = new JComboBox<>(nameManager.getAllNames().toArray(new String[0]));
         selectedVolunteerLabel = new JLabel(" "); // Initially empty

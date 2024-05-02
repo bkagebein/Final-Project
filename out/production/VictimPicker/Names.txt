@@ -1,4 +1,4 @@
-Levi Landers,8,0,0
+Levi Landers,0,0,0
 Nicholas Colet,0,0,0
 Danny Barmanbekov,0,0,0
 Nate Benson,0,0,0

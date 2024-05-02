@@ -32,6 +32,7 @@ public class NameManager {
 
         // If no names are left, return null.
         if (possibleChoices.isEmpty()) {
+            pickedVictims.clear();
             return null;
         }
 

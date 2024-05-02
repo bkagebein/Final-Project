@@ -124,7 +124,13 @@ public class VictimManager {
         }
         return Absentees;
     }
-    
+    public void manuPickVictim(String name){
+        for (int i =0;i<allNames.size();i++){
+            if (name == allNames.get(i).getName()) {
+               pickedVictims.add(allNames.get(i));
+            }
+        }
+    }
     public void addVictim(String name){
         Victim v = new Victim(name);
         allNames.add(v);

@@ -1,16 +1,19 @@
 import javax.swing.*;
+import javax.sound.sampled.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import javax.sound.sampled.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Timer extends JPanel {
     JLabel timerLabel;
-    JButton tenButton, thirtyButton, minuteButton, startButton, stopButton, clearButton, phoneAFriendButton;
+    JButton tenButton, thirtyButton, minuteButton, startButton, stopButton, clearButton, phoneAFriendButton, resumeButton;
     int counter, totalCounter;
     javax.swing.Timer swingTimer;
-    Clip clip;
+
+    // Map to store audio clips
+    private Map<String, Clip> soundClips = new HashMap<>();
 
     public Timer() {
         setupUI();
@@ -27,6 +30,8 @@ public class Timer extends JPanel {
         stopButton = new JButton("Stop Timer");
         clearButton = new JButton("Clear Timer");
         phoneAFriendButton = new JButton("Phone a Friend");
+        resumeButton = new JButton("Resume Time");
+
 
         this.add(timerLabel);
         this.add(tenButton);
@@ -34,36 +39,87 @@ public class Timer extends JPanel {
         this.add(minuteButton);
         this.add(startButton);
         this.add(stopButton);
+        this.add(resumeButton);
         this.add(clearButton);
         this.add(phoneAFriendButton);
     }
 
     private void setupAudio() {
-        try {
-            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File("fart.wav"));
-            clip = AudioSystem.getClip();
-            clip.open(audioInputStream);
-        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException ex) {
-            ex.printStackTrace();
+        String[] soundFileNames = {
+                "AddTime.wav",
+                "ClearTime.wav",
+                "PhoneaFriend.wav",
+                "ResumeTime.wav",
+                "Start.wav",
+                "StopTimer.wav"
+        };
+
+        System.out.println("Current working directory: " + new File(".").getAbsolutePath());
+
+        for (String fileName : soundFileNames) {
+            try {
+                File audioFile = new File(fileName);
+                if (!audioFile.exists()) {
+                    System.err.println("File does not exist: " + audioFile.getAbsolutePath());
+                    continue;
+                }
+                AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(audioFile);
+                Clip clip = AudioSystem.getClip();
+                clip.open(audioInputStream);
+                soundClips.put(fileName, clip);
+            } catch (UnsupportedAudioFileException | IOException | LineUnavailableException ex) {
+                System.err.println("Error loading sound file: " + fileName);
+                ex.printStackTrace();
+            }
         }
     }
 
     private void addActionListeners() {
-        tenButton.addActionListener(this::addTime);
-        thirtyButton.addActionListener(this::addTime);
-        minuteButton.addActionListener(this::addTime);
-        startButton.addActionListener(e -> startTimer());
-        stopButton.addActionListener(e -> stopTimer());
-        clearButton.addActionListener(e -> clearTimer());
-        phoneAFriendButton.addActionListener(e -> phoneAFriend());
-    }
+        tenButton.addActionListener(e -> {
+            addTime(e);
+            playSound("AddTime.wav");
+        });
+        thirtyButton.addActionListener(e -> {
+            addTime(e);
+            playSound("AddTime.wav");
+        });
+        minuteButton.addActionListener(e -> {
+            addTime(e);
+            playSound("AddTime.wav");
+        });
+        startButton.addActionListener(e -> {
+            startTimer();
+            playSound("Start.wav");
+        });
+        stopButton.addActionListener(e -> {
+            stopTimer();
+            playSound("StopTimer.wav");
+        });
+        resumeButton.addActionListener(e -> {
+            resumeTimer();
+            playSound("ResumeTime.wav");
+        });
+        clearButton.addActionListener(e -> {
+            clearTimer();
+            playSound("ClearTime.wav");
+        });
+        phoneAFriendButton.addActionListener(e -> {
+            phoneAFriend();
+            playSound("PhoneaFriend.wav");
 
+        });
+    }
+    private void resumeTimer() {
+        if (swingTimer != null && !swingTimer.isRunning() && counter > 0) {
+            swingTimer.start(); // Resume the timer
+        }
+    }
     private void addTime(ActionEvent e) {
         int value = Integer.parseInt(((JButton) e.getSource()).getText().replaceAll("s", ""));
         totalCounter += value;
         counter = totalCounter;
         timerLabel.setText("Timer: " + counter);
-        playSound();
+        playSound("AddTime.wav"); // Assuming you want the add time sound here
     }
 
     private void startTimer() {
@@ -79,16 +135,15 @@ public class Timer extends JPanel {
                 }
             });
             swingTimer.start();
+            playSound("Start.wav"); // Assuming you want the start sound here
         }
-        playSound();
     }
-
 
     private void stopTimer() {
         if (swingTimer != null && swingTimer.isRunning()) {
             swingTimer.stop();
+            playSound("StopTimer.wav"); // Assuming you want the stop sound here
         }
-        playSound();
     }
 
     private void clearTimer() {
@@ -98,22 +153,32 @@ public class Timer extends JPanel {
         if (swingTimer != null) {
             swingTimer.stop();
         }
-        playSound();
+        playSound("ClearTime.wav"); // Assuming you want the clear sound here
     }
 
-    private void phoneAFriend()  {
+    private void phoneAFriend() {
         if (swingTimer != null && swingTimer.isRunning()) {
             swingTimer.stop(); // Pause the timer
-                playSound();
+            playSound("PhoneaFriend.wav"); // Assuming you want the phone a friend sound here
+        }
+    }
+
+    private void playSound(String soundFileName) {
+        // Stop any currently playing clips before starting a new one
+        for (Clip c : soundClips.values()) {
+            if (c.isRunning()) {
+                c.stop();
+                c.setFramePosition(0);
             }
         }
 
-    private void playSound() {
+        // Play the requested clip
+        Clip clip = soundClips.get(soundFileName);
         if (clip != null) {
-            clip.stop();
-            clip.setFramePosition(0);
-            clip.start();
+            clip.setFramePosition(0); // Rewind to the beginning
+            clip.start();     // Start playing
+        } else {
+            System.err.println("Audio clip not found: " + soundFileName);
         }
     }
 }
-

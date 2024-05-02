@@ -9,7 +9,7 @@ import java.util.Date;
 public class ReadVictimsFromFile {
     static public int numberOfVictims = 0;
     //private static final String fileName = "studentinfo.txt";
-    private static final String filePath = "C:\\Users\\Lanmine\\Desktop\\Final-Project\\Names.txt";
+    private static final String filePath = "Names.txt";
 
 
     public static ArrayList<Victim> readVictimsFromFile(String file_name) throws IOException {

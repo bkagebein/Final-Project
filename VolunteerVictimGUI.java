@@ -296,16 +296,24 @@ public class VolunteerVictimGUI extends JFrame {
     }
 
     public static void main(String[] args) {
-        ArrayList<Victim> victims = null;
+        ArrayList<Victim> victimsTemp = null;
+
         try {
-            victims = ReadVictimsFromFile.readVictimsFromFile("C:\\Users\\Lanmine\\Desktop\\Final-Project\\Names.txt");
+            victimsTemp = ReadVictimsFromFile.readVictimsFromFile("Names.txt");
         } catch (IOException e) {
             e.printStackTrace();
-            // Handle the exception as needed (e.g., show an error message)
+            JOptionPane.showMessageDialog(null, "Could not read victims from the file.", "Error", JOptionPane.ERROR_MESSAGE);
+            victimsTemp = new ArrayList<>(); // Provide a default empty list if there's an error
         }
-        ArrayList<Victim> finalVictims = victims;
-        SwingUtilities.invokeLater(() -> new VolunteerVictimGUI(finalVictims).setVisible(true));
+
+        // Declare a final variable for use in the lambda
+        final ArrayList<Victim> victims = victimsTemp;
+
+        // Now we can safely pass victims to the GUI
+        SwingUtilities.invokeLater(() -> new VolunteerVictimGUI(victims).setVisible(true));
     }
+
+
 
 
 

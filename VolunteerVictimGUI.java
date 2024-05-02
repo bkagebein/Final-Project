@@ -319,9 +319,5 @@ public class VolunteerVictimGUI extends JFrame {
         }
         return questions;
     }
-
-
-
-
 }
 

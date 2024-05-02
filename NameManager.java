@@ -11,15 +11,17 @@ public class NameManager {
     private Map<String, Integer> scores;
 
     // Constructor initializes the NameManager with a list of names.
-    public NameManager(List<String> names) {
-        this.allNames = new ArrayList<>(names); // Initialize with provided names.
+    public NameManager(ArrayList<Victim> victims) {
+        this.allNames = new ArrayList<>(); // Initialize with provided names.
         this.pickedVictims = new HashSet<>(); // Initialize empty set for victims.
         this.scores = new HashMap<>(); // Initialize empty map for scores.
         this.absences = new HashMap<>();
         // Set initial score of 0 for each name.
-        for (String name : names) {
-            scores.put(name, 0);
-            absences.put(name, 0);  // Initialize absences
+        for (Victim victim : victims)
+        {
+            scores.put(victim.name, victim.score);
+            absences.put(victim.name, victim.numAbsent);
+            allNames.add(victim.name);
         }
     }
 
@@ -52,15 +54,19 @@ public class NameManager {
     }
 
     // Resets data, settings all scores to 0
-    public void resetScores(){
+    public void resetScores(ArrayList<Victim> victims){
         // Reset each name's score to 0.
         for (String name : scores.keySet()) {
             scores.put(name, 0);
         }
+        for (Victim victim : victims)
+        {
+            scores.put(victim.name, 0);
+        }
     }
 
     // Updates the score for a given name.
-    public void updateScore(String name, int points) {
+    public void updateScore(ArrayList<Victim> victims, String name, int points) {
         // if points result in score going below 0, don't add points
         if (scores.get(name) <= 0 && points < 0) {
             scores.put(name, 0);
@@ -69,10 +75,22 @@ public class NameManager {
         } else {
             scores.put(name, scores.getOrDefault(name, 0) + points);
         }
+        for (Victim victim : victims)
+        {
+            if (victim.name.equals(name)) {
+                victim.score+=points;
+            }
+        }
     }
 
-    public void incrementAbsence(String name) {
+    public void incrementAbsence(ArrayList<Victim> victims, String name) {
         absences.put(name, absences.getOrDefault(name, 0) + 1);  // Increment absence
+        for (Victim victim : victims)
+        {
+            if (victim.name.equals(name)) {
+                victim.numAbsent++;
+            }
+        }
     }
 
     public List<String> getAllNames() {

@@ -49,7 +49,10 @@ public class VolunteerVictimGUI extends JFrame {
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
-
+        setPreferredSize(new Dimension(1200, 900)); // Or any other dimension that fits
+        // Adjusts the size of the frame to the preferred size of its components
+        pack();
+        setLocationRelativeTo(null); // Center the frame on the screen
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -70,7 +73,8 @@ public class VolunteerVictimGUI extends JFrame {
 
 
         // Top Section - Volunteer Dropdown and Display
-        JPanel topPanel = new JPanel(new FlowLayout());
+        FlowLayout topLayout = new FlowLayout(FlowLayout.LEFT, 20, 5); // increased horizontal and vertical gaps
+        JPanel topPanel = new JPanel(topLayout);
         volunteerDropdown = new JComboBox<>(nameManager.getAllNames().toArray(new String[0]));
         selectedVolunteerLabel = new JLabel(" "); // Initially empty
         incrementVolunteerScoreButton = new JButton("+2");
@@ -82,7 +86,8 @@ public class VolunteerVictimGUI extends JFrame {
         topPanel.add(decrementVolunteerScoreButton);
 
         // Middle Section - Victim Selection and Score Increment
-        JPanel middlePanel = new JPanel(new FlowLayout());
+        FlowLayout middleLayout = new FlowLayout(FlowLayout.CENTER, 15, 10);
+        JPanel middlePanel = new JPanel(middleLayout); FlowLayout clearLayout = new FlowLayout(FlowLayout.CENTER, 15, 10);
         pickRandomVictimButton = new JButton("Pick Random Victim");
         numberOfVictimsField = new JTextField(5);
         numberOfVictimsLabel = new JLabel("Enter Number of Victims:");

@@ -5,7 +5,7 @@ Nate Benson,2,1,0
 Akhil John Bosco,0,0,0
 Jeremiah Jordan,0,0,0
 Bret Kagebein,0,0,0
-Reagan Kohler,0,0,0
+Reagan Kohler,0,1,0
 Chandler Mason,1,0,0
 Matthew McCallister,0,1,0
 Oluwatobiloba Olaoye,0,0,0

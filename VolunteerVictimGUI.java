@@ -64,7 +64,7 @@ public class VolunteerVictimGUI extends JFrame {
         //Question panel
         JLabel questionLabel = new JLabel("Loading Questions",JLabel.CENTER);
         questionLabel.setPreferredSize(new Dimension(1, 1));
-        questionLabel.setFont(new Font("Serif", Font.BOLD, 69));
+        questionLabel.setFont(new Font("Serif", Font.BOLD, 45));
         System.out.println(new File(".").getAbsolutePath());
         System.out.println("Working Directory = " + System.getProperty("user.dir"));
 
